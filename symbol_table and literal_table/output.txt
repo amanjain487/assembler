@@ -1,0 +1,36 @@
+			##### SYMBOL TABLE #####
+------  --------  -------  --------  -----------  -------  -----------------
+Name    Address   Section  Type      Value        Size     Defined/Undefined
+msg     0x0       data     Byte      "%d",10,0    4        D
+w1      0x4       data     Word      "abcd",10    6        D
+a       0xa       data     Double    "abcd","ab"  8        D
+d5      0x12      data     Double    100          4        D
+r1      0x0       bss      Byte                   6513249  D
+r2      0x636261  bss      Byte                   10       D
+r3      0x63626b  bss      Word                   4        D
+r5      0x63626f  bss      Double                 4        D
+main    0x0       text     Label                  0        D
+l1      0x7       text     Label                  0        D
+sib     0x21      text     Label                  0        D
+mem     0x2e      text     Label                  0        D
+end     0x89      text     Label                  0        D
+printf            text     Function               0        U
+------  --------  -------  --------  -----------  -------  -----------------
+
+
+	##### Literal TABLE #####
+----  -------  ---------------  -----------
+Name  Section  Type             Value
+msg   data     Byte             "%d",10,0
+w1    data     Word             "abcd",10
+a     data     Double           "abcd","ab"
+d5    data     Double           100
+r1    bss      Byte
+r2    bss      Byte
+r3    bss      Word
+r5    bss      Double
+      text     Immediate Value  1000
+      text     Immediate Value  1000
+      text     Immediate Value  1000
+      text     Immediate Value  1000
+----  -------  ---------------  -----------

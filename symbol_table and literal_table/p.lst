@@ -1,0 +1,51 @@
+     1                                  section .data
+     2 00000000 25640A00                	msg db "%d",10,0
+     3 00000004 616263640A00            	w1 dw "abcd",10
+     4 0000000A 6162636461620000        	a dd "abcd","ab"
+     5 00000012 64000000                	d5 dd 100
+     6                                  
+     7                                  section .bss
+     8 00000000 <res 00636261>          	r1 resb "abc"
+     9 00636261 <res 0000000A>          	r2 resb 10
+    10 0063626B <res 00000004>          	r3 resw 2
+    11 0063626F <res 00000004>          	r5 resd 1
+    12                                  
+    13                                  section .text
+    14                                  	global main
+    15                                  	extern printf
+    16 00000000 31C8                    	main: xor eax,ecx
+    17 00000002 E982000000              	jmp end
+    18 00000007 A1[0A000000]            	l1: mov eax,dword[a]
+    19 0000000C 05E8030000              	add eax,1000
+    20 00000011 0B00                    	or eax,dword[eax]
+    21 00000013 3B05[F2030000]              	cmp eax,dword[a+1000]
+    22 00000019 EB06                        	jmp sib
+    23 0000001B 8B81E8030000                	mov eax,dword[ecx+1000]
+    24 00000021 8B0440                  	sib: mov eax,dword[eax+eax*2]
+    25 00000024 813D[0A000000]E803-     	cmp dword[a],1000
+    25 0000002C 0000               
+    26 0000002E 8900                    	mem:   mov dword[eax], eax
+    27 00000030 812D[F2030000]E803-     	sub dword[a+1000],1000
+    27 00000038 0000               
+    28 0000003A 810446E8030000          	add dword[esi+eax*2],1000
+    29 00000041 75DE                    	jnz sib
+    30 00000043 74E9                    	jz mem
+    31 00000045 40                      	inc eax
+    32 00000046 FF05[0A000000]          	inc dword[a]
+    33 0000004C FF0D[F2030000]          	dec dword[a+1000]
+    34 00000052 FF8400[0A000000]        	inc dword[a+eax*2]
+    35 00000059 56                      	push esi
+    36 0000005A FF35[F2030000]          	push dword[a+1000]
+    37 00000060 68[00000000]            	push msg
+    38 00000065 68E8030000              	push 1000
+    39 0000006A F7E1                    	mul ecx
+    40 0000006C F725[0A000000]          	mul dword[a]
+    41 00000072 F76164                  	mul dword[ecx+100]
+    42 00000075 F7248D[0A000000]        	mul dword[a+ecx*4]
+    43 0000007C E8(00000000)            	call printf
+    44 00000081 FF1481                  	call dword[ecx+eax*4]
+    45 00000084 E8(00000000)            	call msg
+    46 00000089 E8(E8030000)            	end:  call 1000
+    47                                  
+    48                                  
+    49                                  

@@ -1,0 +1,35 @@
+				#####COMBINED SYMBOL TABLE #####
+-----------  ------  --------  -------  --------  ---------------------------------  -------  -----------------
+New Name     Name    Address   Section  Type      Value                              Size     Defined/Undefined
+array        array   0x0       data     Double    10,20,30,40                        16       D
+a            a       0x10      data     Double    4                                  4        D
+msg          msg     0x14      data     Byte      "abcdefghijklmnopqrstuvwxyz",10,0  28       D
+array_prog2  array   0x30      data     Double    1,2,3,4                            16       D
+a_prog2      a       0x40      data     Double    40                                 4        D
+msg_prog2    msg     0x44      data     Byte      "ABCDEFGHIJKLMNOPQRSTUVWXYZ",10,0  28       D
+msg_prog3    msg     0x60      data     Byte      "%d",10,0                          4        D
+w1           w1      0x64      data     Word      "abcd",10,0                        8        D
+a_prog3      a       0x6c      data     Double    "abcd",10,1,"abc"                  16       D
+d5           d5      0x7c      data     Double    100                                4        D
+a7           a7      0x0       bss      Double                                       4        D
+b15          b15     0x4       bss      Byte                                         1        D
+res          res     0x5       bss      Double                                       12       D
+r1           r1      0x11      bss      Byte                                         6513249  D
+r2           r2      0x636272  bss      Byte                                         10       D
+r3           r3      0x63627c  bss      Word                                         4        D
+r5           r5      0x636280  bss      Double                                       4        D
+main         main    0x0       text     Label                                        0        D
+b            b       0x14      text     Label                                        0        D
+d            d       0x1b      text     Label                                        0        D
+c            c       0x53      text     Label                                        0        D
+end          end     0x71      text     Label                                        0        D
+main_prog2   main    0x74      text     Label                                        0        D
+lp           lp      0x78      text     Label                                        0        D
+a_prog2      a       0x8b      text     Label                                        0        D
+main_prog3   main    0x99      text     Label                                        0        D
+l1           l1      0x9b      text     Label                                        0        D
+sib          sib     0xb5      text     Label                                        0        D
+mem          mem     0xc4      text     Label                                        0        D
+printf       printf            text     Function                                     0        U
+end_prog3    end     0x121     text     Label                                        0        D
+-----------  ------  --------  -------  --------  ---------------------------------  -------  -----------------
