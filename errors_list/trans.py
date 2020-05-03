@@ -24,7 +24,7 @@ def check_operator(temp,op):
     while j < len(temp) and temp[j] != ' ':
         operator += temp[j]
         j += 1
-    if operator == "jmp" or operator == "jnz" or operator == "jz":
+    if operator == "jmp" or operator == "jnz" or operator == "jz" or operator == "call" or operator == "push":
         return False
     if operator in op:
         return True
@@ -66,47 +66,46 @@ def checkdouble(value):
 
 
 #dictionary of frequently used opcodes along with their instruction size
-op = {'mov' : {"reg,reg" : 2,
-               "reg,mem" : {"eax" : 5,
-                            "oth" : 6},
-               "reg,imm" : 5,
-               "reg,mem[reg]" : 2,
+op = {'mov' : ["reg,reg",
+               "reg,mem[var]",
+               "reg,imm",
+               "reg,mem[reg]",
+               "reg,mem[var+var]",
+               "reg,mem[reg+var]",
+               "reg,mem[var+reg]",
+               "reg,mem[reg+reg]",
+               "reg,mem[reg*var]",
+               "reg,mem[var*var]"
+               "reg,mem[var*reg]",
+               "reg,mem[reg+reg*var]",
+               "reg,mem[var+reg*var]",
+               "mem[var],reg",
+               "mem[var],imm",
+               "mem[reg],reg",
+               "mem[reg],imm",
+               "mem[reg*var],reg",
+               "mem[reg*var],imm",
+               "mem[var*reg],reg",
+               "mem[var*var],reg",
+               "mem[var*var],imm",
+               "mem[var*reg],imm",
+               "mem[var+var],reg",
+               "mem[var+var],imm",
+               "mem[reg+var],reg",
+               "mem[reg+var],imm",
+               "mem[reg+reg],reg",
+               "mem[reg+reg],imm",
+               "mem[var+reg],reg",
+               "mem[var+reg],imm",
+               "mem[reg+reg*var],reg",
+               "mem[reg+reg*var],imm",
+               "mem[var+reg*var],reg",
+               "mem[var+reg*var],imm"
+               ],
 
-               "reg,mem[var+imm]" : {'eax' : 5,
-                                     'oth' : 6},
-
-               "reg,mem[reg+imm]" : {'127' : 3,
-                                     '128' : 6},
-
-               "reg,mem[reg+reg*s]" : 3,
-               "reg,mem[var+reg*s]": 7,
-
-               "mem,reg" : {'eax' : 5,
-                            'oth' : 6},
-               "mem,imm" : 10,
-
-               "mem[reg],reg" : 2,
-               "mem[reg],imm" : 6,
-
-               "mem[var+imm],reg" : {"eax" : 5,
-                                     "oth" : 6},
-               "mem[var+imm],imm" : 10,
-
-               "mem[reg+imm],reg" : {'127' : 3,
-                                     '128' : 6},
-               "mem[reg+imm],imm" : {'127' : {'127' : 7,
-                                              '128' : 7},
-                                     '128' : {'127' : 10,
-                                              '128' : 10}
-                                     },
 
 
-               "mem[reg+reg*s],reg" : 3,
-               "mem[reg+reg*s],imm" : 7,
 
-               "mem[var+reg*s],reg" : 7,
-               "mem[var+reg*s],imm" : 11
-               },
       'add' : {"reg,reg" : 2,
                "reg,mem" : 6,
                "reg,imm" : {'127' : 3,
@@ -337,33 +336,36 @@ op = {'mov' : {"reg,reg" : 2,
                                        '128' : 11
                                        }
                },
-      'mul' : {"reg" : 2,
-               "mem[reg]" : 2,
-               "mem" : 6,
-               "mem[reg+imm]" : {'127' : 3,
-                                 '128' : 6},
-               "mem[var+imm]" : 6,
-               "mem[var+reg*s]" : 7,
-               "mem[reg+reg*s]" : 3
-               },
-      'inc' : {"reg" : 1,
-               "mem[reg]" : 2,
-               "mem" : 6,
-               "mem[reg+imm]" : {'127' : 3,
-                                 '128' : 6},
-               "mem[var+imm]" : 6,
-               "mem[var+reg*s]" : 7,
-               "mem[reg+reg*s]" : 3
-               },
-      'dec' : {"reg" : 1,
-               "mem[reg]" : 2,
-               "mem" : 6,
-               "mem[reg+imm]" : {'127' : 3,
-                                 '128' : 6},
-               "mem[var+imm]" : 6,
-               "mem[var+reg*s]" : 7,
-               "mem[reg+reg*s]" : 3
-               },
+      'mul' : ["reg",
+               "mem[reg]",
+               "mem[var]",
+               "mem[reg+var]",
+               "mem[var+var]",
+               "mem[reg+reg]",
+               "mem[var+reg]",
+               "mem[var+reg*var]",
+               "mem[reg+reg*var]"
+               ],
+      'inc' : ["reg",
+               "mem[reg]",
+               "mem[var]",
+               "mem[reg+var]",
+               "mem[var+var]",
+               "mem[reg+reg]",
+               "mem[var+reg]",
+               "mem[var+reg*var]",
+               "mem[reg+reg*var]"
+               ],
+      'dec' : ["reg",
+               "mem[reg]",
+               "mem[var]",
+               "mem[reg+var]",
+               "mem[var+var]",
+               "mem[reg+reg]",
+               "mem[var+reg]",
+               "mem[var+reg*var]",
+               "mem[reg+reg*var]"
+               ],
       'jmp' : {"fwd" : {"127" : 2,
                         "128" : 5},
                "bwd" : {"127" : 2,
@@ -401,20 +403,30 @@ op = {'mov' : {"reg,reg" : 2,
               },
       'push' : ["reg",
                "mem[reg]",
-               "mem",
-               "mem[reg+imm]",
-               "mem[var+imm]",
-               "mem[var+reg*s]",
-               "mem[reg+reg*s]",
+               "mem[var]",
+               "mem[reg+var]",
+                "mem[reg+reg]",
+                "mem[var+reg]",
+                "mem[reg*var]",
+                "mem[var*reg]",
+                "mem[var*var]",
+               "mem[var+var]",
+               "mem[var+reg*var]",
+               "mem[reg+reg*var]",
                 "imm",
                 "label"],
       'call' : ["reg",
                "mem[reg]",
-               "mem",
-               "mem[reg+imm]",
-               "mem[var+imm]",
-               "mem[var+reg*s]",
-               "mem[reg+reg*s]",
+               "mem[var]",
+               "mem[reg+var]",
+                "mem[reg+reg]",
+                "mem[var+reg]",
+                "mem[reg*var]",
+                "mem[var*reg]",
+                "mem[var*var]",
+               "mem[var+var]",
+               "mem[var+reg*var]",
+               "mem[reg+reg*var]",
                 "imm",
                 "label"]
       }
@@ -453,7 +465,12 @@ error_table = {"data" : {"repeat_variable" : "Variable Inconsistently Redefined"
                          "operator_missing" : "parser: instruction expected",
                          "imm as 1st operand" : "invalid combination of opcode and operands",
                          "label_repeat" : "Label inconsistently redefined",
-                         "incorrect_start" : "label or instruction expected at start of line"}
+                         "incorrect_start" : "label or instruction expected at start of line",
+                         "op" : "comma, colon, decorator or end of line expected after operand",
+                         "syntax" : "expression syntax error",
+                         "*" : "impossible segment base multiplier",
+                         "sib" : "invalid effective address",
+                         "var,var" : "unable to multiply 2 non scalar objects"}
 }
 
 
@@ -507,6 +524,14 @@ while i < len(file):
             errors.append([file[i],error_table[symbol_section][error]])
         file.remove(file[i])
         continue
+
+    if temp[0].isdigit():
+        error = "incorrect_start"
+        errors.append([file[i], error_table["text"][error]])
+        i = i + 1
+        continue
+
+
 
     l = temp.split()
     for a in l:
@@ -564,8 +589,8 @@ while i < len(file):
         e = 0
         for k in symbol_table:
             if k[0] == symbol_name:
-                if k[6] == 'U':
-                    k[6] = 'D'
+                if k[2] == 'U':
+                    k[2] = 'D'
                     defined = 1
                 else:
                     error = "label_repeat"
@@ -589,23 +614,37 @@ while i < len(file):
         i = i+1
         continue
 
+
+
+
+
+
     #calculate the size of each instruction to calculate address of label if any
+    operator_yes = 0
     if(is_operator(temp,op)):
+        operator_yes = 1
+
+    else:
+        symbol_name = temp.split(" ", 1)[0]
+        t = temp.split(" ", 1)[1]
+        if is_operator(t, op):
+            symbol_table.append([symbol_name,symbol_section,"D"])
+            operator_yes = 1
+            temp = t
+
+
+    if operator_yes == 1:
         new_new_temp = temp
-        operator = get_operator(temp,op)
-        temp = temp.split(operator+' ',1)[1]
+        operator = get_operator(temp, op)
+        temp = temp.split(operator+' ', 1)[1]
         op1 = ""
         op2 = ""
         new_temp = temp
         check_address = ""
         #if ',' in instruction, the instruction contains 2 operands for sure
         if ',' in temp:
-            j= 0
-            while temp[j] != ',':
-                op1 += temp[j]
-                j += 1
-            temp = temp[j+1:]
-            op2 = temp.strip()
+            op1 = temp.split(",",1)[0].strip()
+            op2 = temp.split(",",1)[1].strip()
 
         #else only 1 operand, 2nd one is none
         else:
@@ -613,153 +652,415 @@ while i < len(file):
             op2 = None
         address_getter = ""
         op1 = op1.strip()
+
+
+        operand1 = op1
+        operand2 = op2
         if op1 in registers:
             address_getter = "reg"
 
-        elif "*" in op1:
-            op1 = op1.split("[",1)[1][:-1].strip()
-            if op1[:3] in registers:
-                address_getter = "mem[reg+reg*s]"
-            else:
-                address_getter = "mem[var+reg*s]"
-        elif "dword[" in op1 or "[" in op1:
-            if "dword" in op1:
-                op1 = op1[6:-1]
-            else:
-                op1 = op1[1:-1]
-            if op1[:3] in registers:
-                op1 = op1[3:].strip()
-                if op1 != "" :
-                    address_getter = "mem[reg+imm]"
-                else:
-                    address_getter = "mem[reg]"
-            else:
-                if "+" in op1:
-                    address_getter = "mem[var+imm]"
-                else:
-                    address_getter = "mem"
+        elif "[" in op1:
+            end = 1
+            op1 = op1.strip()
+            if op1[0] == "[":
+                address_getter += "mem["
 
-        elif (operator == "push" or operator == "call" or operator == "jmp" or operator == "jnz" or operator == "jz" ) and "[" not in op1 and "imm" not in address_getter and address_getter == "":
-            address_getter = ""
-            check_address = ""
-            for m in symbol_table:
-                if m[0] == op1:
-                    if operator == "jmp" or operator == "jnz" or operator == "jz":
-                        if m[2] == "text":
-                            if m[1] == None:
-                                if m[3] == "Label":
-                                    address_getter = "fwd"
-                                elif m[3] == "Function":
-                                    address_getter = "label"
-                            else:
-                                check_address = m[1]
-                                address_getter = "bwd"
+            else:
+                check = op1.split("[",1)[0]
+                if check == "dword" or check == "dword ":
+                    address_getter += "mem["
+
+
+                else:
+                    error = "op"
+                    errors.append([file[i], error_table["text"][error]])
+                    end = 0
+                    break
+
+            op1 = op1.split("[", 1)[1].strip()
+            while op1 != "":
+                if op1[0].isdigit() == True:
+                    j = 0
+                    while op1[j].isdigit():
+                        j = j + 1
+                    op1 = op1[j:].strip()
+                    j = 0
+                    if op1[j] == "d" or op1[j] == "q" or op1[j] == "b":
+                        address_getter += "var"
+                        j = j+1
+
+                    elif op1[j] == "+" or op1[j] == "]" or op1[0] == "*":
+                        address_getter += "var"
+
+                    op1 = op1[j:]
+                    j = 0
+                    if op1[j] == "+" or op1[j] == "]" or op1[0] == "*":
+                        if op1[j] == "+":
+                            address_getter += "+"
+
+                        elif op1[j] == "*":
+                            address_getter += "*"
+
                         else:
-                            address_getter = "label"
+                            op1 = op1[j:].strip()
+                            if op1 == "]":
+                                address_getter += "]"
+
+
 
                     else:
-                        address_getter = "label"
-            if address_getter == "":
-                try:
-                    x = int(op1)
-                    address_getter = "imm"
-                except:
-                    if operator == "jmp" or operator == "jnz" or operator == "jz":
-                        address_getter = "fwd"
+                        error = "syntax"
+                        errors.append([file[i], error_table["text"][error]])
+                        end = 0
+                        break
+
+
+                elif op1[:3] in registers:
+                    address_getter += "reg"
+                    op1 = op1[3:].strip()
+                    if op1 == "]":
+                        address_getter += "]"
+                    elif op1[0] == "+":
+                        address_getter += "+"
+                    elif op1[0] == "*":
+                        address_getter += "*"
                     else:
-                        address_getter = "label"
+                        error = "syntax"
+                        errors.append([file[i], error_table["text"][error]])
+                        end = 0
+                        break
+
+                else:
+                    check = ""
+                    j = 0
+                    while op1[j].isalnum():
+                        check += op1[j]
+                        j = j+1
+                    q = 0
+                    for x in symbol_table:
+                        if x[0].strip() == check.strip():
+                            address_getter += "var"
+                            op1 = op1.split(check,1)[1].strip()
+
+                            if op1 == "]":
+                                address_getter += "]"
+
+                            elif op1[0] == "+" or op1[0] == "*":
+                                address_getter += op1[0]
+                            q = 1
+                            break
+
+                    if q == 0:
+                        error = "label"
+                        errors.append([file[i], error_table["text"][error]])
+                        break
 
 
+                op1 = op1.strip()
+                if op1.strip() == "]":
+                    op1 = ""
+                else:
+                    op1 = op1[1:].strip()
+
+
+
+            if "+reg*var" in address_getter:
+                op1 = operand1
+                op1 = op1.split("*",1)[1].strip()[:-1].strip()
+                if op1 == "2" or op1 == "4" or op1 == "8":
+                    end = 1
+                else:
+                    error = "sib"
+                    errors.append([file[i], error_table["text"][error]])
+                    i = i+1
+                    continue
+
+            elif "[reg*var]" in address_getter:
+                op1 = operand1
+                op1 = op1.split("[",1)[1].strip().strip()
+                op1 = op1.split("*", 1)[1].strip()[:-1].strip()
+                if op1 == "2" or op1 == "4" or op1 == "8":
+                    end = 1
+                else:
+                    error = "sib"
+                    errors.append([file[i], error_table["text"][error]])
+                    i = i + 1
+                    continue
+
+            elif "[var*reg]" in address_getter:
+                op1 = operand1
+                op1 = op1.split("[",1)[1].strip().strip()
+                op1 = op1.split("*", 1)[0].strip().strip()
+                if op1 == "2" or op1 == "4" or op1 == "8":
+                    end = 1
+                else:
+                    error = "sib"
+                    errors.append([file[i], error_table["text"][error]])
+                    i = i + 1
+                    continue
+
+            elif "var*var" in address_getter:
+                op1 = operand1
+                op1 = op1.split("[", 1)[1].strip()[:-1].strip()
+                var1 = op1.split("*", 1)[0].strip()
+                var2 = op1.split("*", 1)[1].strip()
+                if var1.isdigit() != True or var2.isdigit() != True:
+                    error = "sib"
+                    errors.append([file[i], error_table["text"][error]])
+                    i = i + 1
+                    continue
+
+
+
+            elif "[var+var]" in address_getter:
+                op1 = operand1
+                op1 = op1.split("[", 1)[1].strip()[:-1].strip()
+                var1 = op1.split("+", 1)[0].strip()
+                var2 = op1.split("+", 1)[1].strip()
+                if var1.isdigit() or var2.isdigit():
+                    no_problem = 1
+
+                else:
+                    error = "sib"
+                    errors.append([file[i], error_table["text"][error]])
+                    i = i + 1
+                    continue
+
+            elif "reg*reg" in address_getter:
+                error = "var,var"
+                errors.append([file[i], error_table["text"][error]])
+                i = i + 1
+                continue
+
+
+
+            if end == 0:
+                i = i + 1
+                continue
+
+        elif op1[0].isdigit():
+            if check_operator(new_new_temp,op):
+                error = "incorrect_start"
+                errors.append([file[i], error_table["text"][error]])
+                i = i + 1
+                continue
+
+            else:
+                address_getter = "imm"
 
 
 
         if op2 != None:
-            op2 = op2.strip()
             if op2 in registers:
-                address_getter += ',reg'
+                address_getter += ",reg"
 
-            elif "*" in op2:
-                op2 = op2.split("[", 1)[1][:-1].strip()
-                if op2[:3] in registers:
-                    address_getter += ",mem[reg+reg*s]"
-                else:
-                    address_getter += ",mem[var+reg*s]"
+            elif "[" in op2:
+                end = 1
+                op2 = op2.strip()
+                if op2[0] == "[":
+                    address_getter += ",mem["
 
-            elif "dword[" in op2 or "[" in op2:
-                if "dword" in op2:
-                    op2 = op2[6:-1]
                 else:
-                    op2 = op2[1:-1]
-                if op2[:3] in registers:
-                    op2 = op2[3:].strip()
-                    if op2 != "":
-                        address_getter += ",mem[reg+imm]"
+                    check = op2.split("[", 1)[0]
+                    if check == "dword" or check == "dword ":
+                        address_getter += ",mem["
+
+
                     else:
-                        address_getter += ",mem[reg]"
-                else:
-                    if "+" in op2:
-                        address_getter += ",mem[var+imm]"
-                    else:
-                        address_getter += ",mem"
+                        error = "op"
+                        errors.append([file[i], error_table["text"][error]])
+                        end = 0
+                        break
 
-            else:
+                op2 = op2.split("[", 1)[1].strip()
+                while op2 != "":
+                    if op2[0].isdigit() == True:
+                        j = 0
+                        while op2[j].isdigit():
+                            j = j + 1
+                        op2 = op2[j:].strip()
+                        j = 0
+                        if op2[j] == "d" or op2[j] == "q" or op2[j] == "b":
+                            address_getter += "var"
+                            j = j + 1
+
+                        elif op2[j] == "+" or op2[j] == "]" or op2[0] == "*":
+                            address_getter += "var"
+
+                        op2 = op2[j:]
+                        j = 0
+                        if op2[j] == "+" or op2[j] == "]" or op2[0] == "*":
+                            if op2[j] == "+":
+                                address_getter += "+"
+
+                            elif op2[j] == "*":
+                                address_getter += "*"
+
+                            else:
+                                op2 = op2[j:].strip()
+                                if op2 == "]":
+                                    address_getter += "]"
+
+
+
+                        else:
+                            error = "syntax"
+                            errors.append([file[i], error_table["text"][error]])
+                            end = 0
+                            break
+
+
+                    elif op2[:3] in registers:
+                        address_getter += "reg"
+                        op2 = op2[3:].strip()
+                        if op2 == "]":
+                            address_getter += "]"
+                        elif op2[0] == "+":
+                            address_getter += "+"
+                        elif op2[0] == "*":
+                            address_getter += "*"
+                        else:
+                            error = "syntax"
+                            errors.append([file[i], error_table["text"][error]])
+                            end = 0
+                            break
+
+                    else:
+                        check = ""
+                        j = 0
+                        while op2[j].isalnum():
+                            check += op2[j]
+                            j = j + 1
+                        q = 0
+                        for x in symbol_table:
+                            if x[0].strip() == check.strip():
+                                address_getter += "var"
+                                op2 = op2.split(check, 1)[1].strip()
+
+                                if op2 == "]":
+                                    address_getter += "]"
+
+                                elif op2[0] == "+" or op2[0] == "*":
+                                    address_getter += op2[0]
+                                q = 1
+                                break
+
+                        if q == 0:
+                            error = "label"
+                            errors.append([file[i], error_table["text"][error]])
+                            break
+
+                    op2 = op2.strip()
+                    if op2.strip() == "]":
+                        op2 = ""
+                    else:
+                        op2 = op2[1:].strip()
+
+
+
+                if "+reg*var" in address_getter:
+                    op2 = operand2
+                    op2 = op2.split("*", 1)[1].strip()[:-1].strip()
+                    if op2 == "2" or op2 == "4" or op2 == "8":
+                        end = 1
+                    else:
+                        error = "sib"
+                        errors.append([file[i], error_table["text"][error]])
+                        i = i + 1
+                        continue
+
+                elif "[reg*var]" in address_getter:
+                    op2 = operand2
+                    op2 = op2.split("[", 1)[1].strip().strip()
+                    op2 = op2.split("*", 1)[1].strip()[:-1].strip()
+                    if op2 == "2" or op2 == "4" or op2 == "8":
+                        end = 1
+                    else:
+                        error = "sib"
+                        errors.append([file[i], error_table["text"][error]])
+                        i = i + 1
+                        continue
+
+                elif "[var*reg]" in address_getter:
+                    op2 = operand2
+                    op2 = op2.split("[", 1)[1].strip().strip()
+                    op2 = op2.split("*", 1)[0].strip().strip()
+                    if op2 == "2" or op2 == "4" or op2 == "8":
+                        end = 1
+                    else:
+                        error = "sib"
+                        errors.append([file[i], error_table["text"][error]])
+                        i = i + 1
+                        continue
+
+                elif "var*var" in address_getter:
+                    op2 = operand2
+                    op2 = op2.split("[", 1)[1].strip()[:-1].strip()
+                    var1 = op2.split("*", 1)[0].strip()
+                    var2 = op2.split("*", 1)[1].strip()
+                    if var1.isdigit() != True or var2.isdigit() != True:
+                        error = "sib"
+                        errors.append([file[i], error_table["text"][error]])
+                        i = i + 1
+                        continue
+
+
+
+                elif "[var+var]" in address_getter:
+                    op2 = operand2
+                    op2 = op2.split("[", 1)[1].strip()[:-1].strip()
+                    var1 = op2.split("+", 1)[0].strip()
+                    var2 = op2.split("+", 1)[1].strip()
+                    if var1.isdigit() or var2.isdigit():
+                        no_problem = 1
+
+                    else:
+                        error = "sib"
+                        errors.append([file[i], error_table["text"][error]])
+                        i = i + 1
+                        continue
+
+                if end == 0:
+                    i = i + 1
+                    continue
+
+
+
+
+            elif op2[0].isdigit():
                 address_getter += ",imm"
+
+        temp = new_new_temp
+        if not check_operator(temp,op) and address_getter == "":
+            print(temp)
+
 
 
 
         #find any undefined function used or called in the program
         #if present add it to symbol table
-        temp = new_temp
-        if operator == 'call':
-            temp = temp.strip()
-            if address_getter == "label":
-                check = 0
-                for s in symbol_table:
-                    if s[0] == temp:
-                        check = 1
-                        break
-                if check == 0:
-                    symbol_name = temp
-                    symbol_def = "U"
-                    symbol = []
-                    symbol.append(symbol_name)
-                    symbol.append(symbol_section)
-                    symbol.append(symbol_def)
-                    symbol_table.append(symbol)
-
-        #if not then see if the instruction contains any immediate value
-        #if yes add it to literal table
-        else:
-            j = 0
-            while j < len(temp) and temp[j] != ",":
-                j = j+1
-            temp = temp[j+1:]
-            temp = temp.strip()
-            if temp in registers:
-                i = i + 1
-                continue
-            elif "dword[" in temp:
-                i = i + 1
-                continue
         temp = new_new_temp
 
 
         new_size = op[operator]
-        try:
-            if address_getter in new_size:
-                new_size = 0
-        except:
+        if address_getter in new_size:
+            new_size = 0
+
+        else:
             error = "operator_missing"
             errors.append([file[i], error_table["text"][error]])
             i = i + 1
             continue
 
 
-    #to check if given instruction contains operators
-    #if yes skip because immediate value added already
-    if(check_operator(temp,op)):
-        i = i+1
+
+    elif symbol_section == "text":
+        error = "operator_missing"
+        errors.append([file[i], error_table["text"][error]])
+        i = i + 1
         continue
+
+
 
     #if no then check if it contains any constants or user declared data
     else:
@@ -767,17 +1068,13 @@ while i < len(file):
         #then there are 3 cases:
         #1.byte, 2.word, 3.double
         if symbol_section == "data":
+            symbol_name = ""
             j = 0
             while j < len(temp) and temp[j] != ' ':
                 symbol_name += temp[j]
                 j += 1
             temp = temp[j+1:]
 
-            if symbol_name[0].isdigit():
-                error = "incorrect_start"
-                errors.append([file[i], error_table["text"][error]])
-                i = i+1
-                continue
 
             e = 0
             for n in symbol_table:
@@ -854,17 +1151,12 @@ while i < len(file):
         #there are 3 cases
         #1. byte, 2. word, 3.double
         elif symbol_section == "bss" :
+            symbol_name =""
             j = 0
             while j < len(temp) and temp[j] != ' ':
                 symbol_name += temp[j]
                 j += 1
             temp = temp[j + 1:]
-
-            if symbol_name[0].isdigit():
-                error = "incorrect_start"
-                errors.append([file[i], error_table["text"][error]])
-                i = i+1
-                continue
 
             e = 0
             for n in symbol_table:
@@ -927,68 +1219,13 @@ while i < len(file):
         #to counter labels which are declared after jmp or jnz operators
         #extract label and its attributes and add it in symbol_table
         elif symbol_section == "text" :
-            if ("jmp" in temp or "jnz" in temp or "jz" in temp) and address_getter == "label":
-                if "jmp" in temp:
-                    temp = temp.split("jmp ", 1)[1]
-                if "jnz" in temp:
-                    temp = temp.split("jnz ", 1)[1]
-                if "jz" in temp:
-                    temp = temp.split("jz ", 1)[1]
-                symbol_name = temp.strip()
-                defined = 0
-                for k in symbol_table:
-                    if k[0] == symbol_name:
-                        defined = 1
-                if defined == 1:
-                    i = i + 1
-                    continue
-
-                try:
-                    if type(int(temp.strip())) == type(0):
-                        i = i + 1
-                        continue
-                except:
-                    symbol_def = "U"
-
-            else:
-                t = temp.split(" ",1)[1]
-                if(check_operator(t,op)):
-                    symbol_name = temp.split(" ",1)[0]
-                    symbol_def = "D"
-
-                elif ("jmp" in temp or "jnz" in temp or "jz" in temp) and address_getter == "label":
-                    if "jmp" in temp:
-                        temp = temp.split("jmp ", 1)[1]
-                    if "jnz" in temp:
-                        temp = temp.split("jnz ", 1)[1]
-                    if "jz" in temp:
-                        temp = temp.split("jz ", 1)[1]
-                    symbol_name = temp.strip()
-                    defined = 0
-                    for k in symbol_table:
-                        if k[0] == symbol_name:
-                            defined = 1
-                    if defined == 1:
-                        i = i + 1
-                        continue
-
-                    try:
-                        if type(int(temp.strip())) == type(0):
-                            i = i + 1
-                            continue
-                    except:
-                        symbol_def = "U"
+            error = "operator_missing"
+            errors.append([file[i], error_table["text"][error]])
+            i = i + 1
+            continue
 
 
-                elif ("jmp" in temp or "jnz" in temp or "jz" in temp):
-                    i = i+1
-                    continue
 
-                else:
-                    error = "operator_missing"
-                    errors.append([file[i], error_table["text"][error]])
-                    i = i + 1
-                    continue
         #if none of the above sections then skip the iteration
         #it may be empty line
         else:
@@ -1015,7 +1252,6 @@ print(tabulate(errors))
 output.write("\t##### ERROR LIST #####")
 output.write("\n")
 output.write(tabulate(error_table))
-
 
 
 
