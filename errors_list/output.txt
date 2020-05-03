@@ -1,0 +1,11 @@
+	##### ERROR LIST #####
+---------------  --------------  ------------------
+repeat_variable  repeat_varible  only_label
+data_type        data_type       no_parameter
+no_value         no_value        label
+wrong_section    wrong_section   operand
+                                 operator_missing
+                                 imm as 1st operand
+                                 label_repeat
+                                 incorrect_start
+---------------  --------------  ------------------
