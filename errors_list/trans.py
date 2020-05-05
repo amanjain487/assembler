@@ -45,390 +45,24 @@ def get_operator(temp,op):
     else:
         return None
 
+list1 = ["reg,reg", "reg,mem[var]", "reg,imm", "reg,mem[reg]", "reg,mem[var+var]", "reg,mem[reg+var]",
+         "reg,mem[var+reg]","reg,mem[reg+reg]","reg,mem[reg*var]","reg,mem[var*var]","reg,mem[var*reg]",
+         "reg,mem[reg+reg*var]","reg,mem[var+reg*var]","mem[var],reg","mem[var],imm","mem[reg],reg",
+         "mem[reg],imm","mem[reg*var],reg","mem[reg*var],imm","mem[var*reg],reg","mem[var*var],reg",
+         "mem[var*var],imm","mem[var*reg],imm","mem[var+var],reg","mem[var+var],imm","mem[reg+var],reg",
+         "mem[reg+var],imm", "mem[reg+reg],reg","mem[reg+reg],imm","mem[var+reg],reg", "mem[var+reg],imm",
+         "mem[reg+reg*var],reg","mem[reg+reg*var],imm","mem[var+reg*var],reg","mem[var+reg*var],imm"]
 
-def checkbyte(value):
-    while len(value) < 2:
-        value = '0' + value
-    return value
+list2 = ["reg","mem[reg]","mem[var]","mem[reg+var]","mem[var+var]", "mem[reg+reg]","mem[var+reg]",
+         "mem[var+reg*var]","mem[reg+reg*var]"]
 
+list3 = ["reg","mem[reg]","mem[var]","mem[reg+var]","mem[reg+reg]", "mem[var+reg]","mem[reg*var]","mem[var*reg]",
+         "mem[var*var]","mem[var+var]","mem[var+reg*var]","mem[reg+reg*var]","imm","label"],
 
-def checkword(value):
-    while len(value) < 4:
-        value =  value + '00'
-    return value
-
-
-def checkdouble(value):
-    while len(value) < 8:
-        value = value + '00'
-    return value
-
-
-
-#dictionary of frequently used opcodes along with their instruction size
-op = {'mov' : ["reg,reg",
-               "reg,mem[var]",
-               "reg,imm",
-               "reg,mem[reg]",
-               "reg,mem[var+var]",
-               "reg,mem[reg+var]",
-               "reg,mem[var+reg]",
-               "reg,mem[reg+reg]",
-               "reg,mem[reg*var]",
-               "reg,mem[var*var]"
-               "reg,mem[var*reg]",
-               "reg,mem[reg+reg*var]",
-               "reg,mem[var+reg*var]",
-               "mem[var],reg",
-               "mem[var],imm",
-               "mem[reg],reg",
-               "mem[reg],imm",
-               "mem[reg*var],reg",
-               "mem[reg*var],imm",
-               "mem[var*reg],reg",
-               "mem[var*var],reg",
-               "mem[var*var],imm",
-               "mem[var*reg],imm",
-               "mem[var+var],reg",
-               "mem[var+var],imm",
-               "mem[reg+var],reg",
-               "mem[reg+var],imm",
-               "mem[reg+reg],reg",
-               "mem[reg+reg],imm",
-               "mem[var+reg],reg",
-               "mem[var+reg],imm",
-               "mem[reg+reg*var],reg",
-               "mem[reg+reg*var],imm",
-               "mem[var+reg*var],reg",
-               "mem[var+reg*var],imm"
-               ],
-
-
-
-
-      'add' : {"reg,reg" : 2,
-               "reg,mem" : 6,
-               "reg,imm" : {'127' : 3,
-                            '128' : {"eax" : 5,
-                                     "oth" : 6}
-                            },
-               "reg,mem[reg]" : 2,
-
-               "reg,mem[var+imm]" : 6,
-
-               "reg,mem[reg+imm]" : {'127' : 3,
-                                     '128' : 6},
-
-               "reg,mem[reg+reg*s]" : 3,
-               "reg,mem[var+reg*s]": 7,
-
-               "mem,reg" : 6,
-               "mem,imm" : {'127' : 7,
-                            '128' : 10},
-
-               "mem[reg],reg" : 2,
-               "mem[reg],imm" : {'127' : 3,
-                                 '128' : 6},
-
-               "mem[var+imm],reg" : 6,
-               "mem[var+imm],imm" : {'127' : 7,
-                                     '128' : 10},
-
-               "mem[reg+imm],reg" : {'127' : 3,
-                                     '128' : 6},
-               "mem[reg+imm],imm" : {'127' : {'127' : 4,
-                                              '128' : 7},
-                                     '128' : {'127' : 7,
-                                              '128' : 10}
-                                     },
-
-
-               "mem[reg+reg*s],reg" : 3,
-               "mem[reg+reg*s],imm" : {'127' : 4,
-                                       '128' : 7},
-
-               "mem[var+reg*s],reg" : 7,
-               "mem[var+reg*s],imm" : {'127' : 8,
-                                       '128' : 11
-                                       }
-               },
-      'sub' : {"reg,reg" : 2,
-               "reg,mem" : 6,
-               "reg,imm" : {'127' : 3,
-                            '128' : {"eax" : 5,
-                                     "oth" : 6}
-                            },
-               "reg,mem[reg]" : 2,
-
-               "reg,mem[var+imm]" : 6,
-
-               "reg,mem[reg+imm]" : {'127' : 3,
-                                     '128' : 6},
-
-               "reg,mem[reg+reg*s]" : 3,
-               "reg,mem[var+reg*s]": 7,
-
-               "mem,reg" : 6,
-               "mem,imm" : {'127' : 7,
-                            '128' : 10},
-
-               "mem[reg],reg" : 2,
-               "mem[reg],imm" : {'127' : 3,
-                                 '128' : 6},
-
-               "mem[var+imm],reg" : 6,
-               "mem[var+imm],imm" : {'127' : 7,
-                                     '128' : 10},
-
-               "mem[reg+imm],reg" : {'127' : 3,
-                                     '128' : 6},
-               "mem[reg+imm],imm" : {'127' : {'127' : 4,
-                                              '128' : 7},
-                                     '128' : {'127' : 7,
-                                              '128' : 10}
-                                     },
-
-
-               "mem[reg+reg*s],reg" : 3,
-               "mem[reg+reg*s],imm" : {'127' : 4,
-                                       '128' : 7},
-
-               "mem[var+reg*s],reg" : 7,
-               "mem[var+reg*s],imm" : {'127' : 8,
-                                       '128' : 11
-                                       }
-               },
-      'or' : {"reg,reg" : 2,
-               "reg,mem" : 6,
-               "reg,imm" : {'127' : 3,
-                            '128' : {"eax" : 5,
-                                     "oth" : 6}
-                            },
-               "reg,mem[reg]" : 2,
-
-               "reg,mem[var+imm]" : 6,
-
-               "reg,mem[reg+imm]" : {'127' : 3,
-                                     '128' : 6},
-
-               "reg,mem[reg+reg*s]" : 3,
-               "reg,mem[var+reg*s]": 7,
-
-               "mem,reg" : 6,
-               "mem,imm" : {'127' : 7,
-                            '128' : 10},
-
-               "mem[reg],reg" : 2,
-               "mem[reg],imm" : {'127' : 3,
-                                 '128' : 6},
-
-               "mem[var+imm],reg" : 6,
-               "mem[var+imm],imm" : {'127' : 7,
-                                     '128' : 10},
-
-               "mem[reg+imm],reg" : {'127' : 3,
-                                     '128' : 6},
-               "mem[reg+imm],imm" : {'127' : {'127' : 4,
-                                              '128' : 7},
-                                     '128' : {'127' : 7,
-                                              '128' : 10}
-                                     },
-
-
-               "mem[reg+reg*s],reg" : 3,
-               "mem[reg+reg*s],imm" : {'127' : 4,
-                                       '128' : 7},
-
-               "mem[var+reg*s],reg" : 7,
-               "mem[var+reg*s],imm" : {'127' : 8,
-                                       '128' : 11
-                                       }
-               },
-      'cmp' : {"reg,reg" : 2,
-               "reg,mem" : 6,
-               "reg,imm" : {'127' : 3,
-                            '128' : {"eax" : 5,
-                                     "oth" : 6}
-                            },
-               "reg,mem[reg]" : 2,
-
-               "reg,mem[var+imm]" : 6,
-
-               "reg,mem[reg+imm]" : {'127' : 3,
-                                     '128' : 6},
-
-               "reg,mem[reg+reg*s]" : 3,
-               "reg,mem[var+reg*s]": 7,
-
-               "mem,reg" : 6,
-               "mem,imm" : {'127' : 7,
-                            '128' : 10},
-
-               "mem[reg],reg" : 2,
-               "mem[reg],imm" : {'127' : 3,
-                                 '128' : 6},
-
-               "mem[var+imm],reg" : 6,
-               "mem[var+imm],imm" : {'127' : 7,
-                                     '128' : 10},
-
-               "mem[reg+imm],reg" : {'127' : 3,
-                                     '128' : 6},
-               "mem[reg+imm],imm" : {'127' : {'127' : 4,
-                                              '128' : 7},
-                                     '128' : {'127' : 7,
-                                              '128' : 10}
-                                     },
-
-
-               "mem[reg+reg*s],reg" : 3,
-               "mem[reg+reg*s],imm" : {'127' : 4,
-                                       '128' : 7},
-
-               "mem[var+reg*s],reg" : 7,
-               "mem[var+reg*s],imm" : {'127' : 8,
-                                       '128' : 11
-                                       }
-               },
-      'xor' : {"reg,reg" : 2,
-               "reg,mem" : 6,
-               "reg,imm" : {'127' : 3,
-                            '128' : {"eax" : 5,
-                                     "oth" : 6}
-                            },
-               "reg,mem[reg]" : 2,
-
-               "reg,mem[var+imm]" : 6,
-
-               "reg,mem[reg+imm]" : {'127' : 3,
-                                     '128' : 6},
-
-               "reg,mem[reg+reg*s]" : 3,
-               "reg,mem[var+reg*s]": 7,
-
-               "mem,reg" : 6,
-               "mem,imm" : {'127' : 7,
-                            '128' : 10},
-
-               "mem[reg],reg" : 2,
-               "mem[reg],imm" : {'127' : 3,
-                                 '128' : 6},
-
-               "mem[var+imm],reg" : 6,
-               "mem[var+imm],imm" : {'127' : 7,
-                                     '128' : 10},
-
-               "mem[reg+imm],reg" : {'127' : 3,
-                                     '128' : 6},
-               "mem[reg+imm],imm" : {'127' : {'127' : 4,
-                                              '128' : 7},
-                                     '128' : {'127' : 7,
-                                              '128' : 10}
-                                     },
-
-
-               "mem[reg+reg*s],reg" : 3,
-               "mem[reg+reg*s],imm" : {'127' : 4,
-                                       '128' : 7},
-
-               "mem[var+reg*s],reg" : 7,
-               "mem[var+reg*s],imm" : {'127' : 8,
-                                       '128' : 11
-                                       }
-               },
-      'mul' : ["reg",
-               "mem[reg]",
-               "mem[var]",
-               "mem[reg+var]",
-               "mem[var+var]",
-               "mem[reg+reg]",
-               "mem[var+reg]",
-               "mem[var+reg*var]",
-               "mem[reg+reg*var]"
-               ],
-      'inc' : ["reg",
-               "mem[reg]",
-               "mem[var]",
-               "mem[reg+var]",
-               "mem[var+var]",
-               "mem[reg+reg]",
-               "mem[var+reg]",
-               "mem[var+reg*var]",
-               "mem[reg+reg*var]"
-               ],
-      'dec' : ["reg",
-               "mem[reg]",
-               "mem[var]",
-               "mem[reg+var]",
-               "mem[var+var]",
-               "mem[reg+reg]",
-               "mem[var+reg]",
-               "mem[var+reg*var]",
-               "mem[reg+reg*var]"
-               ],
-      'jmp' : {"fwd" : {"127" : 2,
-                        "128" : 5},
-               "bwd" : {"127" : 2,
-                        "128" : 5},
-               "reg" : 2,
-               "mem[reg]" : 2,
-               "mem" : 6,
-               "mem[reg+imm]" : {'127' : 3,
-                                 '128' : 6},
-               "mem[var+imm]" : 6,
-               "mem[var+reg*s]" : 7,
-               "mem[reg+reg*s]" : 3,
-                "imm": {"127": 5,
-                        "128": 5
-                        },
-                "label": 5
-               },
-      'jnz' : {"fwd" : {"127" : 2,
-                        "128" : 6},
-               "bwd" : {"127" : 2,
-                        "128" : 6},
-                "imm": {"127": 6,
-                        "128": 6
-                        },
-                "label": 6
-               },
-      'jz' : {"fwd" : {"127" : 2,
-                        "128" : 6},
-               "bwd" : {"127" : 2,
-                        "128" : 6},
-                "imm": {"127": 6,
-                        "128": 6
-                        },
-                "label": 6
-              },
-      'push' : ["reg",
-               "mem[reg]",
-               "mem[var]",
-               "mem[reg+var]",
-                "mem[reg+reg]",
-                "mem[var+reg]",
-                "mem[reg*var]",
-                "mem[var*reg]",
-                "mem[var*var]",
-               "mem[var+var]",
-               "mem[var+reg*var]",
-               "mem[reg+reg*var]",
-                "imm",
-                "label"],
-      'call' : ["reg",
-               "mem[reg]",
-               "mem[var]",
-               "mem[reg+var]",
-                "mem[reg+reg]",
-                "mem[var+reg]",
-                "mem[reg*var]",
-                "mem[var*reg]",
-                "mem[var*var]",
-               "mem[var+var]",
-               "mem[var+reg*var]",
-               "mem[reg+reg*var]",
-                "imm",
-                "label"]
+#dictionary of frequently used opcodes along with the type of instruction it can be
+op = {  'mov' : list1, 'add' : list1, 'sub' : list1, 'or' :list1, 'cmp' : list1, 'xor' : list1,
+        'mul' : list2, 'inc' : list2, 'dec' : list2,
+        'jmp' : list3,'jnz' : list3,'jz' :list3,'push' : list3,'call' : list3
       }
 
 
@@ -445,6 +79,7 @@ registers = { "eax": "000",
               }
 
 
+#dictionary of common errors
 error_table = {"data" : {"repeat_variable" : "Variable Inconsistently Redefined",
                          "data_type" : "Incorrect Data Type",
                          "no_value" : "No operand for Data Declaration",
@@ -475,13 +110,6 @@ error_table = {"data" : {"repeat_variable" : "Variable Inconsistently Redefined"
 
 
 
-
-
-
-
-
-
-
 #read file
 file = open("prog.asm","r")
 
@@ -495,25 +123,26 @@ for i in temp_file:
     file.append(temp)
 
 
-#pass 1
-
-
-#all fields required in symbol table are defined below
-#same are used in literal table as required
-
+#all fields required in symbol table are defined below and also for error table
+other_symbols = []
 symbol_table = []
-errors = []
+errors = [["Instruction","Error"],["----------- ","----- "]]
 symbol_name = ""
 symbol_section = ""
 symbol_def = "U"
 
 i = 0
 
+final_check = []
+fin_check = 0
 while i < len(file):
     #set default value for each new line
     symbol_name = ""
     temp = file[i]
     error = ""
+
+    #if global or extern functions or labels are defined add them in symbol table
+    #also look for errors in them
     if "global" in temp or "extern" in temp:
         l = temp.split()
         for a in l:
@@ -523,6 +152,11 @@ while i < len(file):
             error = "no_parameter"
             errors.append([file[i],error_table[symbol_section][error]])
         file.remove(file[i])
+        temp = temp.split(" ",1)[1].strip()
+        temp = temp.split()
+        for q in temp:
+            if q.strip() != "":
+                other_symbols.append(q)
         continue
 
     if temp[0].isdigit():
@@ -555,7 +189,7 @@ while i < len(file):
         i += 1
         continue
 
-
+#if bss value declared in data section,then error
     if symbol_section == "data":
         if "resd " in temp or "resb " in temp or "resw " in temp or "resq " in temp:
             error = "wrong_section"
@@ -563,7 +197,7 @@ while i < len(file):
             i = i+1
             continue
 
-
+#if data value declared in bss section,then error
     if symbol_section == "bss":
         if "dd " in temp or "db " in temp or "dw " in temp or "dq " in temp:
             error = "wrong_section"
@@ -586,6 +220,7 @@ while i < len(file):
         defined = 0
 
         #if label already present in symbol_table and if it is undefined make it as defined
+        #and also it is redefining the symbol
         e = 0
         for k in symbol_table:
             if k[0] == symbol_name:
@@ -616,10 +251,7 @@ while i < len(file):
 
 
 
-
-
-
-    #calculate the size of each instruction to calculate address of label if any
+#look for other errors
     operator_yes = 0
     if(is_operator(temp,op)):
         operator_yes = 1
@@ -633,6 +265,7 @@ while i < len(file):
             temp = t
 
 
+#if the instruction starts with operator
     if operator_yes == 1:
         new_new_temp = temp
         operator = get_operator(temp, op)
@@ -653,7 +286,8 @@ while i < len(file):
         address_getter = ""
         op1 = op1.strip()
 
-
+#find the type of instruction
+        #address_getter stores the type of instruction
         operand1 = op1
         operand2 = op2
         if op1 in registers:
@@ -705,8 +339,6 @@ while i < len(file):
                             op1 = op1[j:].strip()
                             if op1 == "]":
                                 address_getter += "]"
-
-
 
                     else:
                         error = "syntax"
@@ -762,8 +394,6 @@ while i < len(file):
                 else:
                     op1 = op1[1:].strip()
 
-
-
             if "+reg*var" in address_getter:
                 op1 = operand1
                 op1 = op1.split("*",1)[1].strip()[:-1].strip()
@@ -804,13 +434,27 @@ while i < len(file):
                 op1 = op1.split("[", 1)[1].strip()[:-1].strip()
                 var1 = op1.split("*", 1)[0].strip()
                 var2 = op1.split("*", 1)[1].strip()
-                if var1.isdigit() != True or var2.isdigit() != True:
-                    error = "sib"
+                sym1 = 0
+                sym2 = 0
+                for z in symbol_table:
+                    if var1.strip() == z[0].strip():
+                        sym1 = 1
+                    if var2.strip() == z[0].strip():
+                        sym2 = 1
+                    if sym1 == 1 and sym2 == 1:
+                        break
+
+                if sym1 == 1 and sym2 == 1:
+                    error = "var,var"
                     errors.append([file[i], error_table["text"][error]])
                     i = i + 1
                     continue
 
-
+                elif var1.isdigit() != True or var2.isdigit() != True:
+                    error = "sib"
+                    errors.append([file[i], error_table["text"][error]])
+                    i = i + 1
+                    continue
 
             elif "[var+var]" in address_getter:
                 op1 = operand1
@@ -832,8 +476,6 @@ while i < len(file):
                 i = i + 1
                 continue
 
-
-
             if end == 0:
                 i = i + 1
                 continue
@@ -849,7 +491,8 @@ while i < len(file):
                 address_getter = "imm"
 
 
-
+        #address_getter if instruction has only 1 operand is found.
+        #but if instruction has 2 operands, type of instruction is modified accordingly
         if op2 != None:
             if op2 in registers:
                 address_getter += ",reg"
@@ -865,12 +508,12 @@ while i < len(file):
                     if check == "dword" or check == "dword ":
                         address_getter += ",mem["
 
-
                     else:
                         error = "op"
                         errors.append([file[i], error_table["text"][error]])
                         end = 0
-                        break
+                        i = i+1
+                        continue
 
                 op2 = op2.split("[", 1)[1].strip()
                 while op2 != "":
@@ -901,14 +544,11 @@ while i < len(file):
                                 if op2 == "]":
                                     address_getter += "]"
 
-
-
                         else:
                             error = "syntax"
                             errors.append([file[i], error_table["text"][error]])
                             end = 0
                             break
-
 
                     elif op2[:3] in registers:
                         address_getter += "reg"
@@ -956,8 +596,6 @@ while i < len(file):
                     else:
                         op2 = op2[1:].strip()
 
-
-
                 if "+reg*var" in address_getter:
                     op2 = operand2
                     op2 = op2.split("*", 1)[1].strip()[:-1].strip()
@@ -998,13 +636,27 @@ while i < len(file):
                     op2 = op2.split("[", 1)[1].strip()[:-1].strip()
                     var1 = op2.split("*", 1)[0].strip()
                     var2 = op2.split("*", 1)[1].strip()
-                    if var1.isdigit() != True or var2.isdigit() != True:
-                        error = "sib"
+                    sym1 = 0
+                    sym2 = 0
+                    for z in symbol_table:
+                        if var1.strip() == z[0].strip():
+                            sym1 = 1
+                        if var2.strip() == z[0].strip():
+                            sym2 = 1
+                        if sym1 == 1 and sym2 == 1:
+                            break
+
+                    if sym1 == 1 and sym2 == 1:
+                        error = "var,var"
                         errors.append([file[i], error_table["text"][error]])
                         i = i + 1
                         continue
 
-
+                    elif var1.isdigit() != True or var2.isdigit() != True:
+                        error = "sib"
+                        errors.append([file[i], error_table["text"][error]])
+                        i = i + 1
+                        continue
 
                 elif "[var+var]" in address_getter:
                     op2 = operand2
@@ -1024,24 +676,21 @@ while i < len(file):
                     i = i + 1
                     continue
 
-
-
-
             elif op2[0].isdigit():
                 address_getter += ",imm"
 
         temp = new_new_temp
+
+        #if instructions contain label add them in separate list. we will check them later.
         if not check_operator(temp,op) and address_getter == "":
-            print(temp)
+            final_check.append([file[i],op1])
+            i = i+1
+            continue
 
 
-
-
-        #find any undefined function used or called in the program
-        #if present add it to symbol table
         temp = new_new_temp
 
-
+    #find if the type of instruction is valid or not by looking into op dictionary which further uses 3 lists
         new_size = op[operator]
         if address_getter in new_size:
             new_size = 0
@@ -1052,19 +701,15 @@ while i < len(file):
             i = i + 1
             continue
 
-
-
+    #if instruction did not start with operator or label and if section is text then it is an error
     elif symbol_section == "text":
         error = "operator_missing"
         errors.append([file[i], error_table["text"][error]])
         i = i + 1
         continue
 
-
-
-    #if no then check if it contains any constants or user declared data
     else:
-        #if sectio is data
+        #if section is data
         #then there are 3 cases:
         #1.byte, 2.word, 3.double
         if symbol_section == "data":
@@ -1075,7 +720,7 @@ while i < len(file):
                 j += 1
             temp = temp[j+1:]
 
-
+            #if variable is already defined, then redefine error
             e = 0
             for n in symbol_table:
                 if n[0] == symbol_name and symbol_name.strip() != "":
@@ -1090,7 +735,6 @@ while i < len(file):
             for n in l:
                 if n.strip() == "":
                     l.remove(n)
-
 
             if len(l) ==  1:
 
@@ -1120,7 +764,6 @@ while i < len(file):
                 i = i + 1
                 continue
 
-
             #if byte
             if "db" in temp:
                 j = 0
@@ -1140,12 +783,12 @@ while i < len(file):
                 temp_list = temp.split(",")
                 symbol_def = "D"
 
+            #if none of the above types then it is invalid data type error
             else:
                 error = "data_type"
                 errors.append([file[i], error_table["data"][error]])
                 i = i + 1
                 continue
-
 
         #if in bss section
         #there are 3 cases
@@ -1158,6 +801,8 @@ while i < len(file):
                 j += 1
             temp = temp[j + 1:]
 
+
+            # if variable is already defined, then redefine error
             e = 0
             for n in symbol_table:
                 if n[0] == symbol_name and symbol_name.strip() != "":
@@ -1174,7 +819,6 @@ while i < len(file):
                     l.remove(n)
 
             if len(l) == 1:
-
                 if ("resb" in temp or "resd" in temp or "resw" in temp) and ("resd" in l or "resb" in l or "resw" in l):
                     error = "no_value"
                     errors.append([file[i], error_table["bss"][error]])
@@ -1201,11 +845,9 @@ while i < len(file):
                 i = i + 1
                 continue
 
-
-
             #if byte
             #check size and add it in symbol table
-            if "resb" or "resd" or "resw" in temp:
+            if "resb" in temp or "resd" in temp or "resw" in temp:
                 symbol_def = "D"
 
             else:
@@ -1214,17 +856,12 @@ while i < len(file):
                 i = i + 1
                 continue
 
-
-        #if section is text
-        #to counter labels which are declared after jmp or jnz operators
-        #extract label and its attributes and add it in symbol_table
+        #if section is text and does not contain operator then it is an error
         elif symbol_section == "text" :
             error = "operator_missing"
             errors.append([file[i], error_table["text"][error]])
             i = i + 1
             continue
-
-
 
         #if none of the above sections then skip the iteration
         #it may be empty line
@@ -1233,16 +870,30 @@ while i < len(file):
             continue
 
     #adding symbol along with its attributes at each iteration into symbol table
-    symbol = []
-    symbol.append(symbol_name)
-    symbol.append(symbol_section)
-    symbol.append(symbol_def)
-    symbol_table.append(symbol)
-
+        symbol = []
+        symbol.append(symbol_name)
+        symbol.append(symbol_section)
+        symbol.append(symbol_def)
+        symbol_table.append(symbol)
 
     i += 1
 
-#print both the tables using tabulate function
+#checking those instructions which had labels or instructions
+#by now all the labels and functions are added in symbol table
+#so if a function from any instruction is not in symbol table, then it is undefined symbol error
+for i in final_check:
+    final = 0
+    for x in symbol_table:
+        if x[0].strip() == i[1].strip():
+            final = 1
+            break
+
+    if final == 0:
+        if i[1].strip() not in other_symbols:
+            error = "label"
+            errors.append([i[0], error_table["text"][error]])
+
+#print errors using tabulate function
 #create a new file named output.txt with both the tables
 
 output = open("output.txt","w")
@@ -1251,7 +902,8 @@ print("\t\t##### ERROR LIST #####")
 print(tabulate(errors))
 output.write("\t##### ERROR LIST #####")
 output.write("\n")
-output.write(tabulate(error_table))
+output.write(tabulate(errors))
+
 
 
 
