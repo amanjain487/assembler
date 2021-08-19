@@ -103,7 +103,7 @@ To look for errors in assembly code file:
 
 ### Developer
 
-- Aman Kumar, BCA,
+- Aman Kumar, MCA,
   - Student at Department of Computer Science
   - Savitribai Phule Pune University
   - MailID -> aman487jain@gmail.com
